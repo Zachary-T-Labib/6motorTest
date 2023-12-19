@@ -32,6 +32,104 @@ void pre_auton(void) {
   // Example: clearing encoders, setting servo positions, ...
 }
 
+// PID Settings
+double kP = 0.0;
+double kI = 0.0;
+double kD = 0.0;
+
+double turnkP = 0.0;
+double turnkI = 0.0;
+double turnkD = 0.0;
+
+// Autonomous Settings
+int desiredValue = 0;
+int desiredTurnValue = 0;
+
+int error;         // X-Axis SensorValue (Encoder) - desiredXValue : Position
+int prevError = 0; // X-Axis Position 5 miliseconds or whatever many ago.
+int derivative;    // errorX - prevErrorX : Speed
+int totalError = 0;// totalErrorX = totalErrorX + errorX
+
+int turnError;
+int turnPrevError = 0;
+int turnDerivative;
+int turnTotalError = 0;
+
+bool resetDriveSensors = false;
+bool enableDrivePID = true;
+
+int DrivePID() {
+
+  while(enableDrivePID) {
+
+    if (resetDriveSensors) {
+      resetDriveSensors = false;
+
+      leftDrive1.setPosition(0, degrees);
+      leftDrive2.setPosition(0, degrees);
+      leftDrive3.setPosition(0, degrees);
+      rightDrive1.setPosition(0, degrees);
+      rightDrive2.setPosition(0, degrees);
+      rightDrive3.setPosition(0, degrees);
+    }
+    ////////////////////////////////////////////////
+    /// Driving movement PID
+    /////////////////////
+
+    // Assign our destination coordinates to specific arguments 
+    int leftMotorPosition = (leftDrive1.position(degrees) + leftDrive2.position(degrees) + leftDrive3.position(degrees)) / 3;
+    int rightMotorPosition = (rightDrive1.position(degrees) + rightDrive2.position(degrees) + rightDrive3.position(degrees)) / 3;
+
+    int currentPos = (leftMotorPosition + rightMotorPosition) /2;
+    // Potential
+    error = currentPos - desiredValue;
+
+    // Derivative
+    derivative = error - prevError;
+
+    // Integral (Detects if going too slow or fast)
+    totalError += error;
+
+    double lateralMotorPower = (error * kP + derivative * kD + totalError * kI);
+
+    ////////////////////////////////////////////////
+    /// Turning movement PID
+    /////////////////////
+
+    int turnDifference = leftMotorPosition - rightMotorPosition;
+
+    // Potential
+    turnError = turnDifference - desiredTurnValue;
+
+    // Derivative
+    turnDerivative = turnError - turnPrevError;
+
+    // Integral (Detects if going too slow or fast)
+    turnTotalError += turnError;
+
+    double turnMotorPower = (turnError * turnkP + turnDerivative * turnkD + turnTotalError * turnkI);
+
+    // Input motor speed and run motors
+    //leftFront.setVelocity(leftFrontV, percent);
+    //rightFront.setVelocity(rightFrontV, percent);
+    //leftRear.setVelocity(leftRearV, percent);
+    //rightRear.setVelocity(rightRearV, percent);
+
+    leftDrive1.spin(forward, lateralMotorPower + turnMotorPower, voltageUnits::volt);
+    rightDrive1.spin(forward, lateralMotorPower - turnMotorPower, voltageUnits::volt);
+    leftDrive2.spin(forward, lateralMotorPower + turnMotorPower, voltageUnits::volt);
+    rightDrive2.spin(forward, lateralMotorPower - turnMotorPower, voltageUnits::volt);
+    leftDrive3.spin(forward, lateralMotorPower + turnMotorPower, voltageUnits::volt);
+    rightDrive3.spin(forward, lateralMotorPower - turnMotorPower, voltageUnits::volt);
+
+    turnPrevError = turnError;
+    prevError = error;
+    wait(5, msec);
+  }
+
+  return 1;
+}
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
