@@ -27,9 +27,27 @@ competition Competition;
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
+  Inertial.calibrate();
+  Brain.Screen.print("Calibrating Inertial");
+  while(Inertial.isCalibrating()) {
+    wait(25, msec);
+  }
+  Brain.Screen.clearScreen();
 
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+  wingLeft.set(false);
+  wingRight.set(false);
+
+  leftDrive1.setPosition(0, degrees);
+  leftDrive2.setPosition(0, degrees);
+  leftDrive3.setPosition(0, degrees);
+  rightDrive1.setPosition(0, degrees);
+  rightDrive2.setPosition(0, degrees);
+  rightDrive3.setPosition(0, degrees);
+  catapult.setPosition(0, degrees);
+ 
+  intake.setVelocity(100, percent);
+  catapult.setVelocity(100, percent);
+  catapult.setStopping(brake);
 }
 
 // PID Settings
