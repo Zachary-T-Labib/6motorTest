@@ -180,9 +180,9 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  const int wheelTravel = 320;
+  /*const int wheelTravel = 320;
   const int trackWidth = 320;
-  const int wheelBase = 130;
+  const int wheelBase = 130;*/
   int intakePower = 0;
   int catapultPower = 0;
   int wingPower = 0;
@@ -201,7 +201,7 @@ void usercontrol(void) {
     driveR.spin(forward);
     
     if(Controller1.ButtonL1.pressing()) { 
-      if (intakePower = 1) {
+      if (intakePower == 1) {
         intakePower = 0;
       } else {
         intakePower = 1;
@@ -210,7 +210,7 @@ void usercontrol(void) {
     } 
 
     if(Controller1.ButtonL2.pressing()) { 
-      if (intakePower = 2) {
+      if (intakePower == 2) {
         intakePower = 0;
       } else {
         intakePower = 2;
