@@ -148,6 +148,7 @@ int DrivePID() {
   return 1;
 }
 
+
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /*                              Autonomous Task                              */
@@ -159,9 +160,13 @@ int DrivePID() {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+  /*vex::task quirky(DrivePID);
+
+  resetDriveSensors = true;
+  desiredValue = 500;
+  desiredTurnValue = 200;
+
+  vex::task::sleep(1000);*/
 }
 
 /*---------------------------------------------------------------------------*/
@@ -181,6 +186,7 @@ void usercontrol(void) {
   int intakePower = 0;
   int catapultPower = 0;
   int wingPower = 0;
+  int holdMode = 0;
   motor_group driveL(leftDrive1, leftDrive2, leftDrive3);
   motor_group driveR(rightDrive1, rightDrive2, rightDrive3);
 
@@ -194,11 +200,11 @@ void usercontrol(void) {
     driveL.spin(forward);
     driveR.spin(forward);
     
-    if(Controller1.ButtonX.pressing()) { 
+    if(Controller1.ButtonL1.pressing()) { 
       intakePower = 1;
     } 
 
-    if(Controller1.ButtonB.pressing()) { 
+    if(Controller1.ButtonL2.pressing()) { 
       intakePower = 0;
     } 
 
@@ -228,11 +234,11 @@ void usercontrol(void) {
       break;
   }
 
-    if(Controller1.ButtonUp.pressing()) { 
+    if(Controller1.ButtonR1.pressing()) { 
       wingPower = 1;
     } 
 
-    if(Controller1.ButtonDown.pressing()) { 
+    if(Controller1.ButtonR2.pressing()) { 
       wingPower = 0;
     }
 
@@ -245,6 +251,27 @@ void usercontrol(void) {
       wingLeft.set(false);
       wingRight.set(false);
       break;
+  }
+
+    if(Controller1.ButtonX.pressing()) {
+      holdMode = 1;
+    }
+
+    if(Controller1.ButtonB.pressing()) {
+      holdMode = 0;
+    }
+
+    switch(holdMode) {
+    case 1:
+      catapult.spinToPosition(150, degrees);
+      break;
+    case 0:
+      catapult.spinToPosition(210, degrees);
+      break;
+  }
+
+  if (catapult.position(degrees) > 360) {
+    catapult.setPosition(0, degrees);
   }
 
     wait(5, msec);
