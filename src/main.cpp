@@ -201,14 +201,26 @@ void usercontrol(void) {
     driveR.spin(forward);
     
     if(Controller1.ButtonL1.pressing()) { 
-      intakePower = 1;
+      if (intakePower = 1) {
+        intakePower = 0;
+      } else {
+        intakePower = 1;
+      }
+      
     } 
 
     if(Controller1.ButtonL2.pressing()) { 
-      intakePower = 0;
+      if (intakePower = 2) {
+        intakePower = 0;
+      } else {
+        intakePower = 2;
+      }
     } 
 
   switch(intakePower) {
+    case 2:
+      intake.spin(reverse);
+      break;
     case 1:
       intake.spin(forward);
       break;
