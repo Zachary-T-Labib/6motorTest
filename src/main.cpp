@@ -46,7 +46,7 @@ void pre_auton(void) {
   catapult.setPosition(0, degrees);
  
   intake.setVelocity(100, percent);
-  catapult.setVelocity(100, percent);
+  catapult.setVelocity(80, percent);
   catapult.setStopping(brake);
 }
 
@@ -191,8 +191,8 @@ void usercontrol(void) {
   motor_group driveR(rightDrive1, rightDrive2, rightDrive3);
 
   while (1) {
-    int velocity = -Controller1.Axis2.position(percent);
-    int turn = -Controller1.Axis1.position(percent);
+    int velocity = Controller1.Axis2.position(percent);
+    int turn = Controller1.Axis1.position(percent);
 
     driveL.setVelocity(velocity + turn, percent);
     driveR.setVelocity(velocity - turn, percent);
@@ -201,21 +201,16 @@ void usercontrol(void) {
     driveR.spin(forward);
     
     if(Controller1.ButtonL1.pressing()) { 
-      if (intakePower == 1) {
-        intakePower = 0;
-      } else {
-        intakePower = 1;
-      }
-      
+      intakePower = 1;
     } 
 
     if(Controller1.ButtonL2.pressing()) { 
-      if (intakePower == 2) {
-        intakePower = 0;
-      } else {
-        intakePower = 2;
-      }
+      intakePower = 2;
     } 
+
+    if (Controller1.ButtonUp.pressing()) {
+      intakePower = 0;
+    }
 
   switch(intakePower) {
     case 2:
@@ -265,7 +260,7 @@ void usercontrol(void) {
       break;
   }
 
-    if(Controller1.ButtonX.pressing()) {
+    /*if(Controller1.ButtonX.pressing()) {
       holdMode = 1;
     }
 
@@ -280,7 +275,7 @@ void usercontrol(void) {
     case 0:
       catapult.spinToPosition(210, degrees);
       break;
-  }
+  }*/
 
   if (catapult.position(degrees) > 360) {
     catapult.setPosition(0, degrees);
