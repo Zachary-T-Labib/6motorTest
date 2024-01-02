@@ -51,7 +51,7 @@ void pre_auton(void) {
 }
 
 // PID Settings
-double kP = 0.0;
+double kP = 0.2;
 double kI = 0.0;
 double kD = 0.0;
 
@@ -60,18 +60,18 @@ double turnkI = 0.0;
 double turnkD = 0.0;
 
 // Autonomous Settings
-int desiredValue = 0;
-int desiredTurnValue = 0;
+double desiredValue = 0;
+double desiredTurnValue = 0;
 
-int error;         // X-Axis SensorValue (Encoder) - desiredXValue : Position
-int prevError = 0; // X-Axis Position 5 miliseconds or whatever many ago.
-int derivative;    // errorX - prevErrorX : Speed
-int totalError = 0;// totalErrorX = totalErrorX + errorX
+double error;         // X-Axis SensorValue (Encoder) - desiredXValue : Position
+double prevError = 0; // X-Axis Position 5 miliseconds or whatever many ago.
+double derivative;    // errorX - prevErrorX : Speed
+double totalError = 0;// totalErrorX = totalErrorX + errorX
 
-int turnError;
-int turnPrevError = 0;
-int turnDerivative;
-int turnTotalError = 0;
+double turnError;
+double turnPrevError = 0;
+double turnDerivative;
+double turnTotalError = 0;
 
 bool resetDriveSensors = false;
 bool enableDrivePID = true;
@@ -95,12 +95,12 @@ int DrivePID() {
     /////////////////////
 
     // Assign our destination coordinates to specific arguments 
-    int leftMotorPosition = (leftDrive1.position(degrees) + leftDrive2.position(degrees) + leftDrive3.position(degrees)) / 3;
-    int rightMotorPosition = (rightDrive1.position(degrees) + rightDrive2.position(degrees) + rightDrive3.position(degrees)) / 3;
+    double leftMotorPosition = (leftDrive1.position(degrees) + leftDrive2.position(degrees) + leftDrive3.position(degrees)) / 3;
+    double rightMotorPosition = (rightDrive1.position(degrees) + rightDrive2.position(degrees) + rightDrive3.position(degrees)) / 3;
 
-    int currentPos = (leftMotorPosition + rightMotorPosition) /2;
+    double currentPos = (leftMotorPosition + rightMotorPosition) /2;
     // Potential
-    error = currentPos - desiredValue;
+    error = desiredValue - currentPos;
 
     // Derivative
     derivative = error - prevError;
@@ -114,10 +114,10 @@ int DrivePID() {
     /// Turning movement PID
     /////////////////////
 
-    int turnDifference = leftMotorPosition - rightMotorPosition;
+    double turnDifference = Inertial.heading(degrees);
 
     // Potential
-    turnError = turnDifference - desiredTurnValue;
+    turnError = desiredTurnValue - turnDifference;
 
     // Derivative
     turnDerivative = turnError - turnPrevError;
@@ -142,6 +142,8 @@ int DrivePID() {
 
     turnPrevError = turnError;
     prevError = error;
+    printf("Power %f\n", lateralMotorPower);
+    printf("Error %f\n", error);
     wait(5, msec);
   }
 
@@ -160,13 +162,13 @@ int DrivePID() {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  /*vex::task quirky(DrivePID);
+  vex::task quirky(DrivePID);
 
   resetDriveSensors = true;
   desiredValue = 500;
-  desiredTurnValue = 200;
+  desiredTurnValue = 0;
 
-  vex::task::sleep(1000);*/
+  vex::task::sleep(1000);
 }
 
 /*---------------------------------------------------------------------------*/
